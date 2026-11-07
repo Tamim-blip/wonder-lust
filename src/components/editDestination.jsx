@@ -183,7 +183,7 @@ export function EditDestination({destination}) {
             onChange={update("description")}
             className={cn(
               FIELD,
-              "h-auto min-h-[130px] py-2.5 leading-6"
+              "h-auto min-h-32.5 py-2.5 leading-6"
             )}
           />
         </Field>

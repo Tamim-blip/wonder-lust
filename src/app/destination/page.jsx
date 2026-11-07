@@ -7,7 +7,7 @@ const DestinitionPage = async() => {
     const res = await fetch("http://localhost:3001/destination")
     const data = await res.json()
     return (
-        <div className='container mx-auto'>
+        <div className='container mx-auto my-15'>
 
             <div className='my-10'>
                 <h1 className='text-5xl'> Explore All Destinations</h1>

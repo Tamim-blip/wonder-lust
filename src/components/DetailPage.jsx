@@ -11,8 +11,9 @@ import {
   Trash2Icon,
 } from "lucide-react";
 import { cn } from "cn";
+import BookingPage from "./bookingPage";
 
-const TEAL = "bg-[#16A1BF] hover:bg-[#128CA8]";
+
 const GREEN = "text-[#16A34A]";
 
 const highlightItems = [
@@ -23,26 +24,16 @@ const highlightItems = [
   "Sunrise trek to Mount Batur",
 ];
 
-const perks = [
-  "Free cancellation up to 7 days",
-  "Travel insurance included",
-  "24/7 customer support",
-];
+
 
 // Not present in the backend schema yet — static until fields are added
 const RATING = "4.9";
 const REVIEWS = "(234 reviews)";
 
-function formatDate(value) {
-  try {
-    return new Date(value).toLocaleDateString("en-US");
-  } catch {
-    return value ?? "";
-  }
-}
+
 
 function DestinationDetail({ destination }) {
-  const { name, country, price, duration, departure, imageUrl, description } =
+  const { name, country,  duration, imageUrl, description } =
     destination;
 
   return (
@@ -109,39 +100,7 @@ function DestinationDetail({ destination }) {
         </div>
 
         {/* Booking sidebar */}
-        <aside className="mt-10 h-fit rounded-lg border border-[#ECECF0] bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.05)] lg:mt-0">
-          <p className="text-sm text-neutral-500">Starting from</p>
-          <p className="mt-1 font-serif text-[40px] leading-none font-medium text-[#16A1BF]">
-            ${price}
-          </p>
-          <p className="mt-1.5 text-sm text-neutral-500">per person</p>
-
-          <div className="mt-6 border-y border-[#ECECF0] py-5">
-            <div className="flex h-10 items-center bg-[#F8FAFC] px-3.5 text-[15px] font-medium text-neutral-900">
-              {formatDate(departure)}
-            </div>
-
-            <button
-              type="button"
-              className={cn(
-                "mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-md text-[15px] font-semibold text-white transition-colors",
-                TEAL
-              )}
-            >
-              Book Now
-              <ArrowRightIcon size={16} />
-            </button>
-          </div>
-
-          <ul className="mt-5 space-y-3.5">
-            {perks.map((perk) => (
-              <li key={perk} className="flex items-center gap-3 text-sm text-neutral-600">
-                <CheckIcon size={16} className={cn("shrink-0", GREEN)} />
-                {perk}
-              </li>
-            ))}
-          </ul>
-        </aside>
+       <BookingPage  destination = { destination}></BookingPage>
       </div>
     </main>
   );
