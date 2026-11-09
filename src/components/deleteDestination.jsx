@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { authClient } from "@/lib/auth-client"
+import { toast } from "@/components/ui/toast"
 import { Trash2Icon } from "lucide-react"
 import { redirect } from "next/navigation"
 
@@ -19,8 +20,9 @@ export function DeleteDestination({id}) {
 
     const HandleDelete = async() => {
 
-      const {data} = await authClient.token()
-      const token = data.token
+      try {
+        const {data} = await authClient.token()
+        const token = data?.token
 
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/destination/${id}`, {
             method : "DELETE",
@@ -30,11 +32,31 @@ export function DeleteDestination({id}) {
         })
 
         const result = await res.json()
-        if(result.deletedCount > 0) {
-            redirect('/destination')
-        }
-        
 
+        if(!res.ok || !(result.deletedCount > 0)){
+            toast.add({
+                title: "Failed to delete destination",
+                description: result?.message || "Something went wrong. Please try again.",
+                type: "error",
+            })
+            return
+        }
+
+        toast.add({
+            title: "Destination deleted",
+            description: "The destination has been removed successfully.",
+            type: "success",
+        })
+      } catch {
+        toast.add({
+            title: "Failed to delete destination",
+            description: "Something went wrong. Please try again.",
+            type: "error",
+        })
+        return
+      }
+
+      redirect('/destination')
     }
   return (
     <AlertDialog>

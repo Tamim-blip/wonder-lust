@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { authClient } from "@/lib/auth-client"
+import { toast } from "@/components/ui/toast"
 import { Trash2Icon } from "lucide-react"
 import { redirect } from "next/navigation"
 
@@ -21,23 +22,43 @@ export function DeleteMyBooking({id}) {
 
         const HandleDelete = async() => {
 
-          const {data} = await authClient.token()
-          const token = data?.token
-           const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/booking/${id}`,{
-            method : "DELETE",
-            headers : {
-              authorization : `Bearer ${token}`
-            }
-          })
+          try {
+            const {data} = await authClient.token()
+            const token = data?.token
 
-          const result = await res.json()
-        if(result.deletedCount > 0) {
-            redirect('/my-booking')
-        }
-         
-         
-        
-      
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/booking/${id}`,{
+              method : "DELETE",
+              headers : {
+                authorization : `Bearer ${token}`
+              }
+            })
+
+            const result = await res.json()
+
+            if(!res.ok || !(result.deletedCount > 0)){
+                toast.add({
+                    title: "Failed to cancel booking",
+                    description: result?.message || "Something went wrong. Please try again.",
+                    type: "error",
+                })
+                return
+            }
+
+            toast.add({
+                title: "Booking cancelled",
+                description: "Your booking has been removed successfully.",
+                type: "success",
+            })
+          } catch {
+            toast.add({
+                title: "Failed to cancel booking",
+                description: "Something went wrong. Please try again.",
+                type: "error",
+            })
+            return
+          }
+
+          redirect('/my-booking')
 
     }
   return (

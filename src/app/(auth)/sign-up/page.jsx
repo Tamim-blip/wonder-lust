@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { signUp } from "@/lib/auth-client"
+import { toast } from "@/components/ui/toast"
 import { redirect } from "next/navigation"
 
 export default function LoginForm(){
@@ -37,10 +38,19 @@ export default function LoginForm(){
         })
 
         if(data){
+            toast.add({
+                title: "Account created",
+                description: "Welcome to Wanderlust! Redirecting you to home...",
+                type: "success",
+            })
             redirect('/')
         }
         if(error){
-            console.log(error)
+            toast.add({
+                title: "Sign up failed",
+                description: error?.message || "Something went wrong. Please try again.",
+                type: "error",
+            })
         }
 
     }

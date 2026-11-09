@@ -4,6 +4,7 @@ import { ArrowRightIcon, CheckIcon } from 'lucide-react';
 import React from 'react';
 import { cn } from "cn";
 import { authClient, useSession } from '@/lib/auth-client';
+import { toast } from '@/components/ui/toast';
 import { da } from 'date-fns/locale';
 const perks = [
     "Free cancellation up to 7 days",
@@ -40,19 +41,42 @@ const BookingPage = ({ destination }) => {
         }
 
 
-        const {data} = await authClient.token()
-        const token = data.token
+        try {
+            const {data} = await authClient.token()
+            const token = data?.token
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/booking`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                authorization : `Bearer ${token}`
-            },
-            body: JSON.stringify(Data)
-        })
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/booking`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    authorization : `Bearer ${token}`
+                },
+                body: JSON.stringify(Data)
+            })
 
-        const confurmation = await res.json()
+            const confurmation = await res.json()
+
+            if(!res.ok){
+                toast.add({
+                    title: "Booking failed",
+                    description: confurmation?.message || "Something went wrong. Please try again.",
+                    type: "error",
+                })
+                return
+            }
+
+            toast.add({
+                title: "Booking confirmed",
+                description: "Your trip has been booked successfully. See you on the adventure!",
+                type: "success",
+            })
+        } catch {
+            toast.add({
+                title: "Booking failed",
+                description: "Something went wrong. Please try again.",
+                type: "error",
+            })
+        }
        
 
 

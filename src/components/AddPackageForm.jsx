@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "@/components/ui/toast";
 import { redirect } from "next/navigation";
 
 const CATEGORIES = ["Beach", "Mountain", "City", "Adventure", "Cultural"];
@@ -52,25 +53,47 @@ function AddPackageForm() {
     event.preventDefault();
    
 
-    const {data, error} = await authClient.token()
+    try {
+      const {data} = await authClient.token()
 
-    const token = data?.token
+      const token = data?.token
 
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/add-destinition`, {
-      method : "POST",
-      headers : {
-        "Content-Type" : "application/json",
-        authorization : `Bearer ${token}`
-      },
-      body : JSON.stringify(values)
-    })
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/add-destinition`, {
+        method : "POST",
+        headers : {
+          "Content-Type" : "application/json",
+          authorization : `Bearer ${token}`
+        },
+        body : JSON.stringify(values)
+      })
 
-   const result = await res.json()
-   if(result){
+      const result = await res.json()
+
+      if(!res.ok){
+        toast.add({
+          title: "Failed to save destination",
+          description: result?.message || "Something went wrong. Please try again.",
+          type: "error",
+        })
+        return
+      }
+
+      toast.add({
+        title: "Destination saved",
+        description: "Your travel package has been added successfully.",
+        type: "success",
+      })
+    } catch {
+      toast.add({
+        title: "Failed to save destination",
+        description: "Something went wrong. Please try again.",
+        type: "error",
+      })
+      return
+    }
+
     redirect('/destination')
-   }
-   
   }
 
   function handleCancel() {

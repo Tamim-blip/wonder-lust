@@ -27,6 +27,7 @@ import {
 import { Field } from "@/components/ui/field"
 import { redirect} from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "@/components/ui/toast";
 
 
 
@@ -55,28 +56,48 @@ export function EditDestination({destination}) {
       const  handleSubmit = async(event) =>{
         event.preventDefault();
 
-        const {data, error} = await authClient.token()
+        try {
+          const {data} = await authClient.token()
 
-        const token = data?.token
+          const token = data?.token
 
-        
+          const {_id, ...updatedData} = values
 
-        const {_id, ...updatedData} = values
-        
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/destination/${_id}`, {
-            method : "PATCH",
-            headers : {
-                "Content-Type" : "application/json",
-                authorization : `Bearer ${token}`
-            },
-            body : JSON.stringify(updatedData)
-        })
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/destination/${_id}`, {
+              method : "PATCH",
+              headers : {
+                  "Content-Type" : "application/json",
+                  authorization : `Bearer ${token}`
+              },
+              body : JSON.stringify(updatedData)
+          })
 
-        const result = await res.json()
-        if(result.modifiedCount > 0){
-            redirect(`/destination`)
+          const result = await res.json()
+
+          if(!res.ok || !(result.modifiedCount > 0)){
+              toast.add({
+                  title: "Failed to save changes",
+                  description: result?.message || "Something went wrong. Please try again.",
+                  type: "error",
+              })
+              return
+          }
+
+          toast.add({
+              title: "Changes saved",
+              description: "Your destination has been updated successfully.",
+              type: "success",
+          })
+        } catch {
+          toast.add({
+              title: "Failed to save changes",
+              description: "Something went wrong. Please try again.",
+              type: "error",
+          })
+          return
         }
-       
+
+        redirect(`/destination`)
       }
 
       
