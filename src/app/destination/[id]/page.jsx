@@ -2,15 +2,29 @@ import { DeleteDestination } from '@/components/deleteDestination';
 import DestinationDetail from '@/components/DetailPage';
 
 import { EditDestination } from '@/components/editDestination';
+import { auth } from '@/lib/auth';
 import { ArrowLeftIcon, PenSquareIcon, Trash2Icon } from 'lucide-react';
+import { headers } from 'next/headers';
 import Link from 'next/link';
 import React from 'react';
 
 const DetailPage = async({params}) => {
 
+
+  const jwtToken = await auth.api.getToken({
+
+      headers : await headers()
+  })
+
+  const token = jwtToken?.token
+
     const {id} = await params
 
-    const res = await fetch(`http://localhost:3001/destination/${id}`)
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/destination/${id}`,{
+      headers : {
+        authorization : `Bearer ${token}`
+      } 
+    })
     const detailData = await res.json()
     return (
        <main className="mx-auto max-w-7xl px-16 pt-10 pb-16">

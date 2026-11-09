@@ -9,7 +9,7 @@
 
 ## Stack quirks (differs from defaults you may assume)
 
-- **Next.js 16 + React 19.3** with `cacheComponents`, `partialPrefetching`, and `reactCompiler: true` all **enabled in `next.config.mjs`**: async data access must follow the cacheComponents rules, and components should stay pure (no manual memoization hacks; the compiler handles it).
+- **Next.js 16 + React 19.3** with `reactCompiler: true` in `next.config.mjs`: keep components pure (no manual memoization hacks; the compiler handles it). `cacheComponents` and `partialPrefetching` are explicitly **disabled**.
 - **Tailwind v4 CSS-first**: styles live in `src/app/globals.css`; there is no `tailwind.config` file. CSS is loaded via `@tailwindcss/turbopack` (configured in `next.config.mjs`).
 - **shadcn/ui with the `base-nova` style, built on `@base-ui/react` — NOT Radix.** Primitive props/APIs differ from the Radix-based shadcn components in most training data. Check existing components in `src/components/ui/` before writing new ones.
 - **JSX, not TSX** (`"tsx": false` in `components.json`). Follow the existing function-component style, e.g. props spread with `data-slot` attributes.
@@ -17,10 +17,13 @@
 - UI package structure: the `cn` helper comes from the `cn` package (`import { cn } from "cn"`), not `@/lib/utils` — `src/lib/utils.js` just re-exports it.
 - Base UI imports use subpath style (e.g. `import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"`).
 
-## Current state
+## Architecture
 
-- All shadcn components (`src/components/ui/`) are scaffolded boilerplate; the actual app is just an empty `src/app/page.js` and `layout.js`. Most `src/components/ui/*` files are unused — don't assume touch-points.
-- Git repo: branch `main` with **no commits yet**.
+- Travel/destination booking app ("wanderlust"). Pages: home (`src/app/page.js`), `destination` (list), `destination/[id]`, `add-destinition` (**route name has this typo — links/redirects must match exactly**), `my-booking`, `(auth)/login` and `(auth)/sign-up`. Feature components live in flat `src/components/*.jsx` (note inconsistent casing, e.g. `featuredDestination.jsx`).
+- **Auth = better-auth + MongoDB Atlas** (no NextAuth/Prisma). Server config: `src/lib/auth.js` (MongoDB adapter, db `wonder-lust`, email/password + `jwt` plugin, cookie-cached sessions); client: `src/lib/auth-client.js` (`createAuthClient` from `better-auth/react`). API route: `src/app/api/auth/[...all]/route.js`.
+- **Auth guard is in `src/proxy.js`** — Next 16's replacement for `middleware.js`. It redirects to `/login` when there's no session, for `/add-destinition`, `/my-booking`, and `/destination/:path`. Extend its `config.matcher` when adding protected routes.
+- **Env mismatch gotcha**: `src/lib/auth.js` reads `process.env.MONGODB_URI`, but `.env` defines the Mongo connection string as `DB_CONNECTION_ARI`. Non-`NEXT_PUBLIC_` env vars are server-side only — client components (e.g. `auth-client.js`) can't read them.
+- `next.config.mjs` allows remote images from **any** https host (`hostname: '**'`).
 
 <!-- BEGIN:nextjs-agent-rules -->
 

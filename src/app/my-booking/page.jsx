@@ -12,7 +12,19 @@ const MyBooking = async() => {
     const user = session?.user
 
 
-    const res = await fetch(`http://localhost:3001/booking/${user.email}`)
+    const jwtToken = await auth.api.getToken({
+        headers  : await headers()
+    })
+
+
+    const token = jwtToken?.token
+
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/booking/${user.email}`, {
+        headers : {
+            authorization : `Bearer ${token}`
+        }
+    })
     const bookings = await res.json()
 
    

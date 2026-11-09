@@ -13,6 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { authClient } from "@/lib/auth-client";
+import { redirect } from "next/navigation";
 
 const CATEGORIES = ["Beach", "Mountain", "City", "Adventure", "Cultural"];
 
@@ -48,18 +50,26 @@ function AddPackageForm() {
 
   const  handleSubmit = async(event) =>{
     event.preventDefault();
-    // TODO: wire to API when the backend exists
+   
 
-    const res = await fetch("http://localhost:3001/add-destinition", {
+    const {data, error} = await authClient.token()
+
+    const token = data?.token
+
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/add-destinition`, {
       method : "POST",
       headers : {
-        "Content-Type" : "application/json"
+        "Content-Type" : "application/json",
+        authorization : `Bearer ${token}`
       },
       body : JSON.stringify(values)
     })
 
-   const data = await res.json()
-   console.log(data)
+   const result = await res.json()
+   if(result){
+    redirect('/destination')
+   }
    
   }
 
@@ -77,6 +87,8 @@ function AddPackageForm() {
             value={values.name}
             onChange={update("name")}
             className={FIELD}
+            required
+          
           />
         </Field>
 
@@ -86,6 +98,7 @@ function AddPackageForm() {
             value={values.country}
             onChange={update("country")}
             className={FIELD}
+            required
           />
         </Field>
 
@@ -115,6 +128,7 @@ function AddPackageForm() {
             value={values.price}
             onChange={update("price")}
             className={FIELD}
+            required
           />
         </Field>
 
@@ -124,6 +138,7 @@ function AddPackageForm() {
             value={values.duration}
             onChange={update("duration")}
             className={FIELD}
+            required
           />
         </Field>
 
@@ -133,6 +148,7 @@ function AddPackageForm() {
             value={values.departure}
             onChange={update("departure")}
             className={cn(FIELD, "w-full")}
+
           />
         </Field>
 
@@ -143,6 +159,7 @@ function AddPackageForm() {
             value={values.imageUrl}
             onChange={update("imageUrl")}
             className={FIELD}
+            required
           />
         </Field>
 

@@ -26,6 +26,7 @@ import {
 
 import { Field } from "@/components/ui/field"
 import { redirect} from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
 
 
@@ -54,20 +55,25 @@ export function EditDestination({destination}) {
       const  handleSubmit = async(event) =>{
         event.preventDefault();
 
-        const {_id, ...updatedData} = values
+        const {data, error} = await authClient.token()
+
+        const token = data?.token
+
         
 
-
-        const res = await fetch(`http://localhost:3001/destination/${_id}`, {
+        const {_id, ...updatedData} = values
+        
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/destination/${_id}`, {
             method : "PATCH",
             headers : {
-                "Content-Type" : "application/json"
+                "Content-Type" : "application/json",
+                authorization : `Bearer ${token}`
             },
             body : JSON.stringify(updatedData)
         })
 
-        const data = await res.json()
-        if(data.modifiedCount > 0){
+        const result = await res.json()
+        if(result.modifiedCount > 0){
             redirect(`/destination`)
         }
        

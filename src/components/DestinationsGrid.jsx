@@ -57,10 +57,3 @@ function DestinationCard({destanition}) {
 export default DestinationCard;
 
 
-// // "name": "Bhole",
-//     "country": "Barishal",
-//     "price": "50",
-//     "duration": "2days/1night",
-//     "departure": "2026-11-10",
-//     "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/ANWiy9S-XjMpV8U8Gs_LQzQPepQTzghHh2w0d_CpFYCgPjyoq8rXieQXiEx-s_9FCMmLctIXtJlAsPHVCV0B99jRYBFQ58R5nvMHiJr6Ku1kZiDvyhEf6FnfE4xtUti-Z_MEncmiLAM6=s1360-w1360-h1020-rw",
-//     "description": "Best place in bangladesh."

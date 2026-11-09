@@ -3,7 +3,8 @@
 import { ArrowRightIcon, CheckIcon } from 'lucide-react';
 import React from 'react';
 import { cn } from "cn";
-import { useSession } from '@/lib/auth-client';
+import { authClient, useSession } from '@/lib/auth-client';
+import { da } from 'date-fns/locale';
 const perks = [
     "Free cancellation up to 7 days",
     "Travel insurance included",
@@ -29,7 +30,7 @@ const BookingPage = ({ destination }) => {
         const departureDate = e.target.date.value
         
 
-        const data = {
+        const Data = {
             userName: user?.name,
             email: user?.email,
             userImage: user?.image,
@@ -38,12 +39,17 @@ const BookingPage = ({ destination }) => {
             bookingDate: new Date()
         }
 
-        const res = await fetch('http://localhost:3001/booking', {
+
+        const {data} = await authClient.token()
+        const token = data.token
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/booking`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                authorization : `Bearer ${token}`
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(Data)
         })
 
         const confurmation = await res.json()
